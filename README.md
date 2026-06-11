@@ -165,7 +165,7 @@ All data stay in the browser unless the user exports them. The app has no backen
 
 ## Limitations
 
-Causal Design Palette organises causal design thinking. It does not estimate causal effects. Formal identification, estimation, robustness checks, and interpretation should be conducted in Stata, R, Python, or specialised qualitative analysis workflows.
+Causal Design Palette organises causal design thinking. It does not estimate causal effects. Formal identification, estimation, robustness checks, and interpretation should be conducted in Stata, Python, or specialised analytical workflows.
 
 The feasibility score is a rule-based completeness indicator. It is not statistical evidence and does not validate the identification strategy.
 
