@@ -367,11 +367,12 @@ function cn(text: string) {
   return <span className="mt-1 block text-xs text-stone-500">{text}</span>;
 }
 
-function Section({ title, eyebrow, children }: { title: string; eyebrow?: string; children: React.ReactNode }) {
+function Section({ title, chinese, eyebrow, children }: { title: string; chinese?: string; eyebrow?: string; children: React.ReactNode }) {
   return (
     <section className="rounded-lg border border-line bg-white p-5 shadow-sm">
       {eyebrow ? <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-sage">{eyebrow}</p> : null}
       <h2 className="text-xl font-semibold text-ink">{title}</h2>
+      {chinese ? <p className="mt-1 text-sm text-stone-500">{chinese}</p> : null}
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -438,7 +439,7 @@ function lines(items: string[]) {
 
 function auditSheetMarkdown(state: PaletteState) {
   const { score, label } = scoreState(state);
-  const notes = state.designNotes[state.selectedDesign] ?? {};
+  const designSpecificNotes = state.designNotes[state.selectedDesign] ?? {};
   return `# Identification Audit Sheet: ${state.project_title || 'Untitled project'}
 
 ## Research Discipline Note
@@ -474,22 +475,22 @@ This audit sheet does not generate a research topic, recommend an identification
 ${state.identifying_assumption}
 
 ## Design Notes
-${lines(Object.entries(notes).map(([key, value]) => `- ${key}: ${value || 'not yet stated'}`))}
+${lines(Object.entries(designSpecificNotes).map(([key, value]) => `- ${key}: ${value || 'not yet stated'}`))}
 
 ## Assumption Audit
-${lines(state.assumptions.map((item) => `- ${item.name}: ${item.status}. Evidence: ${item.evidence || 'not yet stated'}. Notes: ${item.notes || 'none'}`))}
+${lines(state.assumptions.map((item) => `- ${item.name}: ${item.status}. Evidence: ${item.evidence || 'not yet stated'}`))}
 
 ## Threat Audit
-${lines(state.threats.map((item) => `- ${item.name}: ${item.relevance}. Mitigation: ${item.mitigation || 'not yet stated'}. Notes: ${item.notes || 'none'}`))}
+${lines(state.threats.map((item) => `- ${item.name}: ${item.relevance}. Mitigation: ${item.mitigation || 'not yet stated'}`))}
 
 ## Mitigation Plan
 ${lines(state.threats.filter((item) => item.mitigation.trim()).map((item) => `- ${item.name}: ${item.mitigation}`))}
 
 ## Diagnostics and Robustness Plan
-${lines(state.diagnostics.filter((item) => item.status !== 'not planned').map((item) => `- ${item.name}: ${item.status}. Purpose: ${item.purpose}. Variables: ${item.variables || 'not yet stated'}. Notes: ${item.notes || 'none'}`))}
+${lines(state.diagnostics.filter((item) => item.status !== 'not planned').map((item) => `- ${item.name}: ${item.status}. Purpose: ${item.purpose}. Variables: ${item.variables || 'not yet stated'}`))}
 
 ## Economics Table and Figure Plan
-${lines(state.outputs.filter((item) => item.include).map((item) => `- ${item.type}: ${item.name}. Status: ${item.status}. Purpose: ${item.purpose}. Variables: ${item.variables || 'not yet stated'}. Notes: ${item.notes || 'none'}`))}
+${lines(state.outputs.filter((item) => item.include).map((item) => `- ${item.type}: ${item.name}. Status: ${item.status}. Purpose: ${item.purpose}. Variables: ${item.variables || 'not yet stated'}`))}
 
 ## Interpretation Boundary
 ${state.interpretation_limits}
@@ -563,9 +564,11 @@ function migrateState(raw: string | null): PaletteState {
 
 export default function App() {
   const [state, setState] = useState<PaletteState>(() => migrateState(localStorage.getItem(storageKey) ?? localStorage.getItem(legacyStorageKey)));
+  const [showMoreDesigns, setShowMoreDesigns] = useState(false);
   const selectedDesign = designs.find((design) => design.id === state.selectedDesign) ?? designs[0];
   const selectedFields = designFields[state.selectedDesign] ?? [];
   const feasibility = useMemo(() => scoreState(state), [state]);
+  const visibleDesigns = showMoreDesigns ? designs : designs.slice(0, 6);
 
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(state));
@@ -586,6 +589,7 @@ export default function App() {
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.22em] text-brick">Design-first causal research</p>
               <h1 className="mt-3 text-4xl font-semibold tracking-tight text-ink">Causal Design Palette</h1>
+              <p className="mt-1 text-base text-stone-500">因果设计调色板</p>
               <p className="mt-2 text-lg text-stone-700">Identification-discipline canvas for causal research design</p>
               <p className="mt-4 max-w-3xl text-sm leading-6 text-stone-600">Define the research question, shock, Y, identification strategy, assumptions, threats, diagnostics, audit sheet, and output plan before formal estimation.</p>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-600">
@@ -600,7 +604,7 @@ export default function App() {
         </header>
 
         <div className="mt-6 grid gap-6">
-          <Section title="Research Question Setup" eyebrow="Canvas foundation">
+          <Section title="Research Question Setup" chinese="研究问题设置" eyebrow="Canvas foundation">
             <div className="grid gap-4 md:grid-cols-2">
               <Field label="Project title" value={state.project_title} onChange={(value) => setField('project_title', value)} />
               <Field label="Research question" chinese="研究问题" value={state.research_question} onChange={(value) => setField('research_question', value)} multiline />
@@ -613,7 +617,7 @@ export default function App() {
             </div>
           </Section>
 
-          <Section title="Nested Research Questions" eyebrow="From broad to empirical">
+          <Section title="Nested Research Questions" chinese="嵌套研究问题" eyebrow="From broad to empirical">
             <div className="grid gap-4 md:grid-cols-2">
               <Field label="Broad question" value={state.nested_questions.broad} onChange={(value) => setNestedQuestion('broad', value)} multiline />
               <Field label="Intermediate question" value={state.nested_questions.intermediate} onChange={(value) => setNestedQuestion('intermediate', value)} multiline />
@@ -623,7 +627,7 @@ export default function App() {
             </div>
           </Section>
 
-          <Section title="Shock and Y Definition" eyebrow="Treatment logic">
+          <Section title="Shock and Y Definition" chinese="冲击与 Y 的定义" eyebrow="Treatment logic">
             <div className="grid gap-4 md:grid-cols-2">
               <Field label="Shock: policy, event, or exposure" chinese="冲击：政策、事件或暴露" value={state.shock_name} onChange={(value) => setField('shock_name', value)} />
               <SelectField label="Shock type" value={state.shock_type} options={['policy', 'event', 'exposure']} onChange={(value) => setField('shock_type', value)} />
@@ -636,16 +640,16 @@ export default function App() {
             </div>
           </Section>
 
-          <Section title="Design Palette" eyebrow="Identification strategy">
+          <Section title="Design Palette" chinese="识别设计选项" eyebrow="Identification strategy">
             <div className="grid gap-4 lg:grid-cols-2">
-              {designs.map((design) => (
+              {visibleDesigns.map((design) => (
                 <button key={design.id} className={`rounded-lg border p-4 text-left transition ${state.selectedDesign === design.id ? 'border-sage bg-sage/10 ring-2 ring-sage/20' : 'border-line bg-white hover:border-sage/60'}`} onClick={() => setField('selectedDesign', design.id)}>
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
                       <h3 className="font-semibold text-ink">{design.name}</h3>
                       {design.chinese ? <p className="mt-1 text-xs text-stone-500">{design.chinese}</p> : null}
                     </div>
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${design.priority === 'secondary' ? 'bg-brick/10 text-brick' : design.priority === 'combined' ? 'bg-steel/10 text-steel' : 'bg-sage/10 text-sage'}`}>{design.priority === 'secondary' ? 'advanced / secondary' : design.priority}</span>
+                    {design.priority !== 'secondary' ? <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${design.priority === 'combined' ? 'bg-steel/10 text-steel' : 'bg-sage/10 text-sage'}`}>{design.priority}</span> : null}
                   </div>
                   <dl className="mt-3 grid gap-2 text-sm text-stone-700">
                     <div><dt className="font-medium text-stone-900">Best use case</dt><dd>{design.bestUse}</dd></div>
@@ -656,9 +660,14 @@ export default function App() {
                 </button>
               ))}
             </div>
+            <div className="mt-4 flex justify-center">
+              <button className="rounded-md border border-line bg-stone-50 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-white" onClick={() => setShowMoreDesigns((current) => !current)}>
+                {showMoreDesigns ? 'Less' : 'More'}
+              </button>
+            </div>
           </Section>
 
-          <Section title="Selected Design Canvas" eyebrow={selectedDesign.name}>
+          <Section title="Selected Design Canvas" chinese="已选择设计画布" eyebrow={selectedDesign.name}>
             {state.selectedDesign === 'event_did' ? <p className="mb-4 rounded-md border border-steel/20 bg-steel/5 p-3 text-sm text-stone-700">Event-time DiD / Event Study is mainly a way to inspect dynamics, pre-trends, and timing around a treatment or event; it should remain anchored in a defensible comparison structure.</p> : null}
             {selectedDesign.priority === 'secondary' ? <p className="mb-4 rounded-md border border-brick/20 bg-brick/5 p-3 text-sm text-stone-700">This is marked as a secondary option. Use it when the comparison structure is unusually clear and the interpretation remains transparent.</p> : null}
             <div className="grid gap-4 md:grid-cols-2">
@@ -668,7 +677,7 @@ export default function App() {
             </div>
           </Section>
 
-          <Section title="Assumption Checklist" eyebrow="Structured audit">
+          <Section title="Assumption Checklist" chinese="识别假设清单" eyebrow="Structured audit">
             <div className="grid gap-4 lg:grid-cols-2">
               {state.assumptions.map((item) => (
                 <div key={item.id} className="rounded-md border border-line bg-stone-50 p-4">
@@ -676,14 +685,13 @@ export default function App() {
                   <div className="mt-3 grid gap-3 md:grid-cols-3">
                     <SelectField label="Status" value={item.status} options={['clearly stated', 'partially addressed', 'not yet addressed']} onChange={(value) => setState((current) => ({ ...current, assumptions: current.assumptions.map((entry) => entry.id === item.id ? { ...entry, status: value } : entry) }))} />
                     <div className="md:col-span-2"><Field label="Evidence or justification" value={item.evidence} onChange={(value) => setState((current) => ({ ...current, assumptions: current.assumptions.map((entry) => entry.id === item.id ? { ...entry, evidence: value } : entry) }))} multiline /></div>
-                    <div className="md:col-span-3"><Field label="Notes" value={item.notes} onChange={(value) => setState((current) => ({ ...current, assumptions: current.assumptions.map((entry) => entry.id === item.id ? { ...entry, notes: value } : entry) }))} multiline /></div>
                   </div>
                 </div>
               ))}
             </div>
           </Section>
 
-          <Section title="Threat Checklist" eyebrow="Failure modes">
+          <Section title="Threat Checklist" chinese="主要威胁清单" eyebrow="Failure modes">
             <div className="grid gap-4 lg:grid-cols-2">
               {state.threats.map((item) => (
                 <div key={item.id} className="rounded-md border border-line bg-stone-50 p-4">
@@ -691,30 +699,28 @@ export default function App() {
                   <div className="mt-3 grid gap-3 md:grid-cols-3">
                     <SelectField label="Relevance" value={item.relevance} options={['low', 'medium', 'high']} onChange={(value) => setState((current) => ({ ...current, threats: current.threats.map((entry) => entry.id === item.id ? { ...entry, relevance: value } : entry) }))} />
                     <div className="md:col-span-2"><Field label="Mitigation plan" value={item.mitigation} onChange={(value) => setState((current) => ({ ...current, threats: current.threats.map((entry) => entry.id === item.id ? { ...entry, mitigation: value } : entry) }))} multiline /></div>
-                    <div className="md:col-span-3"><Field label="Notes" value={item.notes} onChange={(value) => setState((current) => ({ ...current, threats: current.threats.map((entry) => entry.id === item.id ? { ...entry, notes: value } : entry) }))} multiline /></div>
                   </div>
                 </div>
               ))}
             </div>
           </Section>
 
-          <Section title="Diagnostics and Robustness Plan" eyebrow="Structured pre-analysis checks">
+          <Section title="Diagnostics and Robustness Plan" chinese="诊断与稳健性计划" eyebrow="Structured pre-analysis checks">
             <div className="grid gap-4">
               {state.diagnostics.map((item) => (
                 <div key={item.id} className="rounded-md border border-line bg-stone-50 p-4">
                   <h3 className="font-semibold text-ink">{item.name}</h3>
-                  <div className="mt-3 grid gap-3 md:grid-cols-4">
+                  <div className="mt-3 grid gap-3 md:grid-cols-3">
                     <SelectField label="Status" value={item.status} options={['not planned', 'planned', 'drafted', 'ready']} onChange={(value) => setState((current) => ({ ...current, diagnostics: current.diagnostics.map((entry) => entry.id === item.id ? { ...entry, status: value } : entry) }))} />
                     <Field label="Purpose" value={item.purpose} onChange={(value) => setState((current) => ({ ...current, diagnostics: current.diagnostics.map((entry) => entry.id === item.id ? { ...entry, purpose: value } : entry) }))} multiline />
                     <Field label="Expected variables" value={item.variables} onChange={(value) => setState((current) => ({ ...current, diagnostics: current.diagnostics.map((entry) => entry.id === item.id ? { ...entry, variables: value } : entry) }))} multiline />
-                    <Field label="Notes" value={item.notes} onChange={(value) => setState((current) => ({ ...current, diagnostics: current.diagnostics.map((entry) => entry.id === item.id ? { ...entry, notes: value } : entry) }))} multiline />
                   </div>
                 </div>
               ))}
             </div>
           </Section>
 
-          <Section title="Economics Output Planner" eyebrow="Tables and figures">
+          <Section title="Economics Output Planner" chinese="经济学表格与图形规划" eyebrow="Tables and figures">
             <p className="mb-4 text-sm text-stone-600">Plan the economics-style results package without estimating anything. These entries feed the audit sheet and AI-ready feasibility prompt.</p>
             <div className="grid gap-4">
               {state.outputs.map((item) => (
@@ -723,18 +729,17 @@ export default function App() {
                     <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-steel">{item.type}</p><h3 className="font-semibold text-ink">{item.name}</h3></div>
                     <label className="flex items-center gap-2 text-sm"><input type="checkbox" className="h-4 w-4 accent-sage" checked={item.include} onChange={(event) => setState((current) => ({ ...current, outputs: current.outputs.map((entry) => entry.id === item.id ? { ...entry, include: event.target.checked } : entry) }))} /> include</label>
                   </div>
-                  <div className="mt-3 grid gap-3 md:grid-cols-4">
+                  <div className="mt-3 grid gap-3 md:grid-cols-3">
                     <SelectField label="Status" value={item.status} options={['planned', 'drafted', 'ready']} onChange={(value) => setState((current) => ({ ...current, outputs: current.outputs.map((entry) => entry.id === item.id ? { ...entry, status: value } : entry) }))} />
                     <Field label="Purpose" value={item.purpose} onChange={(value) => setState((current) => ({ ...current, outputs: current.outputs.map((entry) => entry.id === item.id ? { ...entry, purpose: value } : entry) }))} multiline />
                     <Field label="Expected variables" value={item.variables} onChange={(value) => setState((current) => ({ ...current, outputs: current.outputs.map((entry) => entry.id === item.id ? { ...entry, variables: value } : entry) }))} multiline />
-                    <Field label="Notes" value={item.notes} onChange={(value) => setState((current) => ({ ...current, outputs: current.outputs.map((entry) => entry.id === item.id ? { ...entry, notes: value } : entry) }))} multiline />
                   </div>
                 </div>
               ))}
             </div>
           </Section>
 
-          <Section title="Identification Audit Sheet" eyebrow="AI-ready structured summary">
+          <Section title="Identification Audit Sheet" chinese="识别审计表" eyebrow="AI-ready structured summary">
             <div className="grid gap-4 lg:grid-cols-2">
               <div className="rounded-md border border-line bg-stone-50 p-4 text-sm leading-6 text-stone-700">
                 <h3 className="font-semibold text-ink">Core audit</h3>
@@ -756,7 +761,7 @@ export default function App() {
             </div>
           </Section>
 
-          <Section title="Feasibility Score" eyebrow="Rule-based, not evidence">
+          <Section title="Feasibility Score" chinese="可行性评分" eyebrow="Rule-based, not evidence">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="text-4xl font-semibold text-sage">{feasibility.score}/11</p>
@@ -767,7 +772,7 @@ export default function App() {
             </div>
           </Section>
 
-          <Section title="Export Panel" eyebrow="Audit and proposal handoff">
+          <Section title="Export Panel" chinese="导出面板" eyebrow="Audit and proposal handoff">
             <div className="flex flex-wrap gap-3">
               <button className="rounded-md bg-sage px-4 py-2 text-sm font-semibold text-white hover:bg-sage/90" onClick={() => downloadFile('identification-audit-sheet.md', auditSheetMarkdown(state), 'text/markdown;charset=utf-8')}>Export audit sheet as Markdown</button>
               <button className="rounded-md bg-steel px-4 py-2 text-sm font-semibold text-white hover:bg-steel/90" onClick={() => downloadFile('identification-audit-sheet.json', JSON.stringify({ auditSheet: state, feasibility: scoreState(state) }, null, 2), 'application/json;charset=utf-8')}>Export audit sheet as JSON</button>

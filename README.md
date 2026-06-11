@@ -1,14 +1,26 @@
 # Causal Design Palette
 
+因果设计调色板
+
 Causal Design Palette is a static Vite + React + TypeScript app for economists who want to impose identification discipline before formal empirical work.
+
+因果设计调色板是一个静态 Vite + React + TypeScript 应用，面向希望在正式实证工作前施加识别纪律的经济学研究者。
 
 This app does not generate research topics automatically. It does not recommend identification strategies automatically. It does not invent variables. It helps researchers discipline a research idea before estimation.
 
+本应用不会自动生成研究选题，不会自动推荐识别策略，也不会发明变量。它帮助研究者在估计前约束和整理一个研究想法。
+
 ## Purpose
+
+目的
 
 The app organises a research idea into a causal design canvas: research question, nested research questions, unit of analysis, time period, object of study, shock, Y, identification strategy, assumptions, threats, diagnostics, robustness, economics output plan, feasibility score, identification audit sheet, and exportable design memo.
 
+本应用将一个研究想法组织为因果设计画布，包括研究问题、嵌套研究问题、分析单位、研究时期、研究对象、冲击、Y、识别策略、假设、威胁、诊断、稳健性、经济学输出计划、可行性评分、识别审计表和可导出的设计备忘录。
+
 It is a design discipline tool. It helps clarify whether a causal design is coherent before estimation. It does not run regressions, search articles, call an LLM API, create a database, generate Stata/Python/R code, or draw causal graphs.
+
+它是一个设计纪律工具，帮助研究者在估计前判断因果设计是否连贯。它不运行回归、不检索文献、不调用 LLM API、不创建数据库、不生成 Stata/Python/R 代码，也不绘制因果图。
 
 ## Why this tool exists
 
@@ -22,7 +34,7 @@ Only after this discipline is imposed can AI become useful. AI should help refin
 
 AI 生成了100个研究问题、1000个 Y 和10000个 X，甚至通过机器学习帮你构造了几个“高大上”的变量——所以呢？这一“高大上”本身完全没有研究价值。经济学研究的起点不是想法越多越好，不是变量越量子纠缠、越变态越好，而是——在最近流行的评估类研究中，问题是否清楚，“冲击”是否明确，X对Y的影响是否能基于理论或基本逻辑去解释，你的比较结构是否可信，识别假设是否站得住，主要风险（内生性和技术本身的局限）是什么，以及如何处理风险。
 
-Causal Design Palette 正是拳打空泛选题，脚踢概念膨胀的大棒。它要求研究者必须先明确问题和做法，自己想清楚idea和基本方法，再让 AI 辅助整理、审查和组织研究设计。AI 当然可以帮助研究者工作，但不能替代研究者定义问题和识别策略的责任——是的，当你自己明确了问题，并知道该从哪个方向去解决的时候，AI可以给你非常完善的方针。但如果你让它去思考……恐怕你的变量、影响以及整个研究，除了你没有人能理解。（保留原文写上去）
+Causal Design Palette 正是拳打空泛选题，脚踢概念膨胀的大棒。它要求研究者必须先明确问题和做法，自己想清楚idea和基本方法，再让 AI 辅助整理、审查和组织研究设计。AI 当然可以帮助研究者工作，但不能替代研究者定义问题和识别策略的责任——是的，当你自己明确了问题，并知道该从哪个方向去解决的时候，AI可以给你非常完善的方针。但如果你让它去思考……恐怕你的变量、影响以及整个研究，除了你没有人能理解。
 
 ## Identification Discipline
 
@@ -44,13 +56,6 @@ Identification discipline 指研究者在估计前，必须明确研究问题、
 - Combined RDD + DiD
 
 These templates deliberately foreground the joint assumptions, estimand, first-stage logic where relevant, event-time diagnostics, and interpretation boundaries.
-
-## Secondary Designs
-
-- Triple Difference
-- Synthetic Control
-
-These are marked as advanced or secondary options because they often require especially careful comparison logic and transparent interpretation.
 
 ## Features
 
