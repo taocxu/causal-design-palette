@@ -10,6 +10,9 @@ This app does not generate research topics automatically. It does not recommend 
 
 本应用不会自动生成研究选题，不会自动推荐识别策略，也不会发明变量。它帮助研究者在估计前约束和整理一个研究想法。
 
+## Citation
+Xu, T. L., & Wang, H. (2026). Causal Design Palette. GitHub. https://taocxu.github.io/causal-design-palette
+
 ## Purpose
 
 目的

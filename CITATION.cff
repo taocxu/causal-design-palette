@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+title: "Causal Design Palette"
+message: "If you kindly like this tool, please use and list it as below."
+type: software
+authors:
+  - family-names: "Xu"
+    given-names: "Tao Louie"
+  - family-names: "Wang"
+    given-names: "Haoyu"
+year: 2026
+repository-code: "https://github.com/taocxu/causal-design-palette"
+url: "https://taocxu.github.io/causal-design-palette"
+abstract: "A static identification-discipline canvas for causal research design, designed to organise research questions, shocks, Y variables, assumptions, threats, diagnostics, robustness plans, and economics-style output planning before formal estimation."
+keywords:
+  - causal inference
+  - identification
+  - economics
+  - research design
+  - development economics
+  - political economy
+license: MIT
